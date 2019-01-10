@@ -128,7 +128,17 @@
                     </tr>
                     </thead>
                     <tbody id="tbody-opt">
-
+                    % for opt in opt_list:
+                    <tr>
+                        <td>${opt.bk_biz_id}</td>
+                        <td>${opt.operator}</td>
+                        <td>${opt.bk_job_id}</td>
+                        <td>${opt.opt_at}</td>
+                        <td>${opt.host_list}</td>
+                        <td>${opt.job_status}</td>
+                        <td>${opt.job_content}</td>
+                    </tr>
+                    % endfor
                     </tbody>
                 </table>
             </div>

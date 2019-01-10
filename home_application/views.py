@@ -4,6 +4,7 @@ from blueking.component.shortcuts import get_client_by_request
 from common.log import logger
 from common.mymako import render_mako_context, render_json,render_mako_tostring
 from home_application import celery_tasks
+from home_application.models import OptLog
 import datetime
 
 def home(request):
@@ -160,18 +161,10 @@ def get_host(request):
 def fast_execute_script(request):
     """快速执行脚本"""
     bk_biz_id = int(request.POST.get('bk_biz_id'))
-    kwargs = {
-        "bk_biz_id": bk_biz_id,
-        "bk_job_id": 1019
-    }
-    client = get_client_by_request(request)
-    client.set_bk_api_ver('v2')
-    result = client.job.get_job_detail(kwargs)
-    result = client.job.execute_job(kwargs)
-    result = client.job.get_job_instance_log(kwargs)
+    celery_tasks.execute_task(bk_biz_id)
     return render_json({
         'result': True,
-        'data': '提交成功' })
+        'data': '提交成功'})
 
 
 def history(request):
@@ -184,8 +177,9 @@ def history(request):
     # 查询业务
     res = client.cc.search_business()
     bk_biz_list = res.get('data').get('info')
-
+    opt_list = OptLog.objects.order_by('-opt_at')
     return render_mako_context(request,
                                '/home_application/his.html', {
+                                   'opt_list': opt_list,
                                    'bk_biz_list': bk_biz_list,
                                })
